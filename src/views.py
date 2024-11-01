@@ -1,10 +1,14 @@
 import json
-import requests
+import os
 import datetime
 import pandas as pd
 from pathlib import Path
 from typing import List, Dict, Any
 from src.utils import get_currency_rates, get_stock_prices, get_greeting, get_card_data, get_top_transactions
+from dotenv import load_dotenv
+
+# Загружаем переменные окружения
+load_dotenv()
 
 # Определяем путь к файлу operations.xlsx
 data_file_path = Path(__file__).parent.parent / 'data' / 'operations.xlsx'
@@ -13,6 +17,7 @@ data_file_path = Path(__file__).parent.parent / 'data' / 'operations.xlsx'
 transactions = pd.read_excel(data_file_path)
 transactions['Дата операции'] = pd.to_datetime(transactions['Дата операции'], format='%d.%m.%Y %H:%M:%S')
 
+# Получение данных для главной страницы
 def get_main_page_data(date_time: str, transactions: pd.DataFrame) -> Dict[str, Any]:
     """Возвращает JSON-ответ для главной страницы."""
     current_time = datetime.datetime.strptime(date_time, '%Y-%m-%d %H:%M:%S')
@@ -20,7 +25,7 @@ def get_main_page_data(date_time: str, transactions: pd.DataFrame) -> Dict[str, 
     card_data = get_card_data(transactions)
     top_transactions = get_top_transactions(transactions)
     currency_rates = get_currency_rates()
-    stock_prices = get_stock_prices(['AAPL', 'AMZN', 'GOOGL', 'MSFT', 'TSLA'])
+    stock_prices = get_stock_prices(os.getenv('USER_STOCKS').split(','))
 
     for transaction in top_transactions:
         transaction['Дата операции'] = transaction['Дата операции'].strftime('%Y-%m-%d %H:%M:%S')
@@ -33,6 +38,7 @@ def get_main_page_data(date_time: str, transactions: pd.DataFrame) -> Dict[str, 
         'stock_prices': stock_prices
     }
 
+# Получение данных для страницы событий
 def get_events_page_data(date_time: str, transactions: pd.DataFrame, period: str = 'M') -> Dict[str, Any]:
     """Возвращает JSON-ответ для страницы событий."""
     current_time = datetime.datetime.strptime(date_time, '%Y-%m-%d %H:%M:%S')
@@ -64,5 +70,5 @@ def get_events_page_data(date_time: str, transactions: pd.DataFrame, period: str
         'expenses': expenses_by_category,
         'income': income.groupby('Категория')['Сумма операции'].sum().to_dict(),
         'currency_rates': get_currency_rates(),
-        'stock_prices': get_stock_prices(['AAPL', 'AMZN', 'GOOGL', 'MSFT', 'TSLA']),
+        'stock_prices': get_stock_prices(os.getenv('USER_STOCKS').split(','))
     }

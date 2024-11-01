@@ -20,7 +20,6 @@ dist/
 downloads/
 eggs/
 .venv
-.env
 .env_template
 .eggs/
 lib/
@@ -52,6 +51,7 @@ htmlcov/
 .coverage
 .coverage.*
 .cache
+.env
 nosetests.xml
 coverage.xml
 *.cover
