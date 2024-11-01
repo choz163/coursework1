@@ -13,26 +13,26 @@ def main():
 
     # Получение данных для главной страницы
     date_time = '2023-03-08 12:34:56'
-    main_page_data = get_main_page_data(date_time, transactions)  # Передаем transactions
+    main_page_data = get_main_page_data(date_time, transactions)
     print("Главная страница:")
-    print(json.dumps(main_page_data, ensure_ascii=False, indent=4))  # Убедитесь, что выводит кириллицу
+    print(json.dumps(main_page_data, ensure_ascii=False, indent=4))
 
     # Получение выгодных категорий
     year = 2023
     month = 3
-    profitable_categories = get_profitable_categories(transactions, year, month)  # Передаем transactions, year и month
+    profitable_categories = get_profitable_categories(transactions, year, month)
     print("\nВыгодные категории:")
     print(json.dumps(profitable_categories, ensure_ascii=False, indent=4))
 
     # Получение данных для страницы событий
     period = 'M'
-    events_page_data = get_events_page_data(date_time, transactions, period)  # Передаем transactions
+    events_page_data = get_events_page_data(date_time, transactions, period)
     print("\nСтраница событий:")
     print(json.dumps(events_page_data, ensure_ascii=False, indent=4))
 
     # Пример использования функции "Инвесткопилка"
-    limit = 100  # Установите лимит округления
-    investment_amount = get_investment_bank('2023-03', transactions.to_dict('records'), limit)  # Передаем транзакции как список словарей
+    limit = 100
+    investment_amount = get_investment_bank('2023-03', transactions.to_dict('records'), limit)
     print("\nСумма для инвесткопилки:")
     print(investment_amount)
 

@@ -1,8 +1,8 @@
 import datetime
 import logging
-import pandas as pd  # Импортируем pandas
+import pandas as pd
 from typing import List, Dict, Any
-import requests  # Импортируем requests для работы с API
+import requests
 
 # Настройка логирования
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
@@ -15,14 +15,13 @@ def get_currency_rates() -> Dict[str, float]:
 
     try:
         response = requests.get(url)
-        response.raise_for_status()  # Проверка на успешный ответ
+        response.raise_for_status()
         data = response.json()
 
-        # Проверяем наличие данных
         if 'data' in data and len(data['data']) > 0:
             rates = {}
             for rate in data['data']:
-                rates[rate['symbol']] = rate['close']  # Получаем цену закрытия
+                rates[rate['symbol']] = rate['close']
             return rates
         else:
             logging.error(f"Ошибка получения данных: {data.get('error', 'Неизвестная ошибка')}")
@@ -34,7 +33,6 @@ def get_currency_rates() -> Dict[str, float]:
         logging.error(f"Ошибка декодирования JSON: {e}")
         return {}
 
-
 def get_stock_prices(symbols: List[str]) -> Dict[str, float]:
     """Возвращает словарь с ценами на акции."""
     prices = {}
@@ -42,13 +40,12 @@ def get_stock_prices(symbols: List[str]) -> Dict[str, float]:
         url = f'http://api.marketstack.com/v1/eod?access_key={API_KEY}&symbols={symbol}'
         try:
             response = requests.get(url)
-            response.raise_for_status()  # Проверка на успешный ответ
+            response.raise_for_status()
             data = response.json()
 
-            # Проверяем наличие данных
             if 'data' in data and len(data['data']) > 0:
-                last_data = data['data'][0]  # Берем последнюю запись
-                prices[symbol] = last_data['close']  # Получаем цену закрытия
+                last_data = data['data'][0]
+                prices[symbol] = last_data['close']
             else:
                 logging.error(f"Ошибка получения данных для {symbol}: {data.get('error', 'Неизвестная ошибка')}")
         except requests.exceptions.RequestException as e:
@@ -57,7 +54,6 @@ def get_stock_prices(symbols: List[str]) -> Dict[str, float]:
             logging.error(f"Ошибка декодирования JSON: {e}")
 
     return prices
-
 
 def get_greeting(current_time: datetime.datetime) -> str:
     """Возвращает приветствие в зависимости от времени суток."""
@@ -71,19 +67,25 @@ def get_greeting(current_time: datetime.datetime) -> str:
     else:
         return 'Добрый вечер'
 
-
 def get_card_data(transactions: pd.DataFrame) -> List[Dict[str, Any]]:
     """Возвращает список словарей с данными о картах."""
     cards = transactions['Номер карты'].unique()
     card_data = []
+
     for card in cards:
+        if isinstance(card, float):
+            continue  # Пропускаем, если это float (например, NaN)
+
+        card_str = str(card)
+        last_digits = card_str[-4:]
+
         card_data.append({
-            'last_digits': float(str(card[-4:])),
+            'last_digits': last_digits,
             'total_spent': transactions[transactions['Номер карты'] == card]['Сумма операции'].sum(),
             'cashback': transactions[transactions['Номер карты'] == card]['Кэшбэк'].sum()
         })
-    return card_data
 
+    return card_data
 
 def get_top_transactions(transactions: pd.DataFrame) -> List[Dict[str, Any]]:
     """Возвращает список словарей с топ-5 транзакциями."""

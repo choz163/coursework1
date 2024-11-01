@@ -11,23 +11,17 @@ data_file_path = Path(__file__).parent.parent / 'data' / 'operations.xlsx'
 
 # Загрузка данных из Excel-файла
 transactions = pd.read_excel(data_file_path)
-
-# Преобразуем столбец "Дата операции" в формат datetime
 transactions['Дата операции'] = pd.to_datetime(transactions['Дата операции'], format='%d.%m.%Y %H:%M:%S')
 
-
-# Функция для получения JSON-ответа для главной страницы
 def get_main_page_data(date_time: str, transactions: pd.DataFrame) -> Dict[str, Any]:
     """Возвращает JSON-ответ для главной страницы."""
-
     current_time = datetime.datetime.strptime(date_time, '%Y-%m-%d %H:%M:%S')
     greeting = get_greeting(current_time)
     card_data = get_card_data(transactions)
     top_transactions = get_top_transactions(transactions)
     currency_rates = get_currency_rates()
-    stock_prices = get_stock_prices(['AAPL', 'AMZN', 'GOOGL', 'MSFT', 'TSLA'])  # Передаем символы акций
+    stock_prices = get_stock_prices(['AAPL', 'AMZN', 'GOOGL', 'MSFT', 'TSLA'])
 
-    # Преобразуем временные метки в строки для сериализации
     for transaction in top_transactions:
         transaction['Дата операции'] = transaction['Дата операции'].strftime('%Y-%m-%d %H:%M:%S')
 
@@ -39,11 +33,8 @@ def get_main_page_data(date_time: str, transactions: pd.DataFrame) -> Dict[str, 
         'stock_prices': stock_prices
     }
 
-
-# Функция для получения JSON-ответа для страницы событий
 def get_events_page_data(date_time: str, transactions: pd.DataFrame, period: str = 'M') -> Dict[str, Any]:
     """Возвращает JSON-ответ для страницы событий."""
-
     current_time = datetime.datetime.strptime(date_time, '%Y-%m-%d %H:%M:%S')
 
     if period == 'W':
@@ -66,14 +57,12 @@ def get_events_page_data(date_time: str, transactions: pd.DataFrame, period: str
     expenses = transactions_in_period[transactions_in_period['Сумма операции'] < 0]
     income = transactions_in_period[transactions_in_period['Сумма операции'] > 0]
 
-    expenses_by_category = expenses.groupby('Категория')['Сумма операции'].sum().sort_values(ascending=False).head(
-        7).to_dict()
-    expenses_by_category['Остальное'] = expenses.groupby('Категория')['Сумма операции'].sum().sort_values(
-        ascending=False).tail().sum()
+    expenses_by_category = expenses.groupby('Категория')['Сумма операции'].sum().sort_values(ascending=False).head(7).to_dict()
+    expenses_by_category['Остальное'] = expenses.groupby('Категория')['Сумма операции'].sum().sort_values(ascending=False).tail().sum()
 
     return {
         'expenses': expenses_by_category,
         'income': income.groupby('Категория')['Сумма операции'].sum().to_dict(),
         'currency_rates': get_currency_rates(),
-        'stock_prices': get_stock_prices(['AAPL', 'AMZN', 'GOOGL', 'MSFT', 'TSLA']),  # Передаем символы акций
+        'stock_prices': get_stock_prices(['AAPL', 'AMZN', 'GOOGL', 'MSFT', 'TSLA']),
     }
