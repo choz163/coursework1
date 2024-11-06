@@ -1,16 +1,21 @@
 import datetime
 import logging
+import os
 from typing import Any, Dict, List
 
 import pandas as pd
 import requests
+from dotenv import load_dotenv
+
+# Загружаем переменные окружения
+load_dotenv()
 
 # Настройка логирования
 logging.basicConfig(
     level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"
 )
 
-API_KEY = "f98ee1d2c0fbccb39e80f2d528735b0e"
+API_KEY = os.getenv("API_KEY")
 
 
 def get_currency_rates() -> Dict[str, float]:

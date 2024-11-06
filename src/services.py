@@ -1,5 +1,6 @@
 import datetime
 import logging
+import os
 from pathlib import Path
 from typing import Any, Dict, List
 
@@ -15,8 +16,6 @@ logging.basicConfig(
     level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"
 )
 
-API_KEY = "f98ee1d2c0fbccb39e80f2d528735b0e"
-
 # Определяем путь к файлу operations.xlsx
 data_file_path = Path(__file__).parent.parent / "data" / "operations.xlsx"
 
@@ -29,7 +28,7 @@ transactions["Дата операции"] = pd.to_datetime(
 
 def get_currency_rates() -> Dict[str, float]:
     """Возвращает словарь с курсами валют."""
-    url = f"http://api.marketstack.com/v1/eod?access_key={API_KEY}&symbols=USD,RUB"
+    url = f"http://api.marketstack.com/v1/eod?access_key={os.getenv('API_KEY')}&symbols=USD,RUB"
 
     try:
         response = requests.get(url)
@@ -58,7 +57,7 @@ def get_stock_prices(symbols: List[str]) -> Dict[str, float]:
     """Возвращает словарь с ценами на акции."""
     prices = {}
     for symbol in symbols:
-        url = f"http://api.marketstack.com/v1/eod?access_key={API_KEY}&symbols={symbol}"
+        url = f"http://api.marketstack.com/v1/eod?access_key={os.getenv('API_KEY')}&symbols={symbol}"
         try:
             response = requests.get(url)
             response.raise_for_status()
@@ -119,12 +118,11 @@ def get_investment_bank(
             rounded_amount = (transaction["Сумма операции"] // limit + 1) * limit
             total_investment += rounded_amount - transaction["Сумма операции"]
 
-    return total_investment
+        return total_investment
 
-
-def get_simple_search(query: str) -> List[Dict[str, Any]]:
-    """Возвращает список транзакций, содержащих запрос в описании или категории."""
-    return transactions[
-        (transactions["Описание"].str.contains(query))
-        | (transactions["Категория"].str.contains(query))
-    ].to_dict("records")
+        def get_simple_search(query: str) -> List[Dict[str, Any]]:
+            """Возвращает список транзакций, содержащих запрос в описании или категории."""
+            return transactions[
+                (transactions["Описание"].str.contains(query))
+                | (transactions["Категория"].str.contains(query))
+            ].to_dict("records")
