@@ -120,9 +120,10 @@ def get_investment_bank(
 
         return total_investment
 
-        def get_simple_search(query: str) -> List[Dict[str, Any]]:
-            """Возвращает список транзакций, содержащих запрос в описании или категории."""
-            return transactions[
-                (transactions["Описание"].str.contains(query))
-                | (transactions["Категория"].str.contains(query))
-            ].to_dict("records")
+
+def get_simple_search(query: str) -> List[Dict[str, Any]]:
+    """Возвращает список транзакций, содержащих запрос в описании или категории."""
+    return transactions[
+        (transactions["Описание"].str.contains(query))
+        | (transactions["Категория"].str.contains(query))
+        ].to_dict("records")
