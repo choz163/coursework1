@@ -13,18 +13,24 @@ __pycache__/
 *.so
 
 # Distribution / packaging
+API_KEY=f98ee1d2c0fbccb39e80f2d528735b0e
 .Python
 build/
 develop-eggs/
 dist/
 downloads/
 eggs/
+.venv
+.idea
+.env
+.env_template
 .eggs/
 lib/
 lib64/
 parts/
 sdist/
 var/
+.idea/workspace.xml
 wheels/
 share/python-wheels/
 *.egg-info/
@@ -49,6 +55,7 @@ htmlcov/
 .coverage
 .coverage.*
 .cache
+.env
 nosetests.xml
 coverage.xml
 *.cover
